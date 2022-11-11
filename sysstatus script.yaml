@@ -1,0 +1,25 @@
+#!/bin/bash
+#This shell script perform systems analysis including the following commands:
+read -p "Please enter a filename:  " filename
+sudo apt update -y
+sleep 5
+cat /etc/os-release >> $filename
+echo $SHELL
+df -h
+sleep 5
+free -g
+sleep 5
+lscpu
+sleep 5
+top
+#Here your script should capture the following data:
+echo " Who is running the script: $(whoami) "
+sleep 5
+echo "the output cat /etc/os-release should be redirected to a file called <groupname>.log within the script"
+sleep 5
+echo "What location was the script ran: $(pwd) "
+sleep 5
+echo "welcome to Etech Consulting Devops MasterClass"
+echo $?
+
+

@@ -1,0 +1,159 @@
+Bash Beginner Series #10: Automation With Bash
+Ahmed Alkabary Ahmed Alkabary
+Table of Contents
+
+You can now use all the bash skills you have learned in this Bash Beginner Series to create very useful bash scripts that would help you in automating boring repetitive administrative tasks.
+
+Automation should really be your ultimate goal whenever you write a bash script.
+
+In this tutorial, I will show you some automation scripts that you can later extend on to automate any task you want. These scripts will utilize bash arrays, if-else, loops and other concepts you have learned in this series.
+Automating user management with bash script
+
+Creating a user on multiple servers maybe something that you would do on a daily basis as a sysadmin. It is a tedious a task, and so let's create a bash script that automates it.
+
+First, create a text file that includes all the server hostnames or IP addresses where you wish to add the user on.
+
+For example, here I created the file servers.txt that includes five different servers:
+
+kabary@handbook:~$ cat servers.txt
+server1
+server2
+server3
+server4
+server5
+
+Keep in mind, that I have used server hostnames as I have already included the IP addresses in my /etc/hosts file. You can also use SSH config file here.
+
+Now take a look at the following adduser.sh bash script:
+
+#!/bin/bash
+
+servers=$(cat servers.txt)
+
+echo -n "Enter the username: "
+read name
+echo -n "Enter the user id: "
+read uid
+
+for i in $servers; do
+echo $i
+ssh $i "sudo useradd -m -u $uid ansible"
+if [ $? -eq 0 ]; then
+echo "User $name added on $i"
+else
+echo "Error on $i"
+fi
+done
+
+The adduser.sh script would first ask you to enter the username and the user id of the user who you want to add; then, it will loop over and connect to all the servers in the servers.txt file via SSH and add the requested user.
+
+Let’s run the script and see how it works:
+
+The script ran successfully and user ansible was added on all five servers. There are a couple of important points here you need to understand:
+
+    You can either use empty ssh pass phrases or run ssh-agent to avoid getting prompted to enter a key (or password) while the script is running.
+    You must have a valid account that has super user access (without a password requirement) on all the servers.
+
+Imagine that you need to add a user on 100+ different Linux servers! The adduser.sh script can definitely save you countless hours of work.
+Automating backups with bash script
+
+Taking backups is something that we all do on a regular basis so why not automate it? Take a look at the following backup.sh script:
+
+#!/bin/bash
+
+backup_dirs=("/etc" "/home" "/boot")
+dest_dir="/backup"
+dest_server="server1"
+backup_date=$(date +%b-%d-%y)
+
+echo "Starting backup of: ${backup_dirs[@]}"
+
+for i in "${backup_dirs[@]}"; do
+sudo tar -Pczf /tmp/$i-$backup_date.tar.gz $i
+if [ $? -eq 0 ]; then
+echo "$i backup succeeded."
+else
+echo "$i backup failed."
+fi
+scp /tmp/$i-$backup_date.tar.gz $dest_server:$dest_dir
+if [ $? -eq 0 ]; then
+echo "$i transfer succeeded."
+else
+echo "$i transfer failed."
+fi
+done
+
+sudo rm /tmp/*.gzecho "Backup is done."
+
+So, you first created an array named backup_dirs that stores all directory names that we want to backup. Then, you created three other variables:
+
+    dest_dir: To specify the backup destination directory.
+    dest_server: To specify the backup destination server.
+    backup_time: To specify the date of the backup.
+
+Next, for all the directories in the backup_dirs array, create a gzip compressed tar archive in /tmp, then use the scp command to send/copy the backup to the destination server. Finally, remove all the gzip archives from /tmp.
+
+Here is a sample run of the backup.sh script:
+
+kabary@handbook:~$ ./backup.sh
+Starting backup of: /etc /home /boot
+/etc backup succeeded.
+etc-Aug-30-20.tar.gz 100% 1288KB 460.1KB/s   00:02
+/etc transfer succeeded.
+/home backup succeeded.
+home-Aug-30-20.tar.gz 100% 2543KB 547.0KB/s   00:04
+/home transfer succeeded.
+/boot backup succeeded.
+boot-Aug-30-20.tar.gz 100%  105MB 520.2KB/s   03:26
+/boot transfer succeeded.
+Backup is done.
+
+You may want to run take the backups every day at midnight. In this case, you can schedule the script to run as a cron job:
+
+kabary@handbook:~$ crontab -e
+0	0	*	*	* /home/kabary/scripts/backup.sh
+
+Monitoring available disk space
+
+
+Filesystems are destined to run out of space, the only thing you can do is to act fast before your system crashes! You can use the df command to see the remaining space on any filesystem:
+
+kabary@handbook:~$ df -h / /apps /database
+Filesystem Size  Used Avail Use% Mounted on
+/dev/sda5 20G  7.9G   11G  44% /
+/dev/mapper/vg1-applv 4.9G  2.4G  2.3G  52% /apps
+/dev/mapper/vg1-dblv 4.9G  4.5G  180M  97% /database
+
+My /database filesystem is almost out of space as it’s currently at 97% usage. I can display only the usage if I use the awk command to only show the fifth field.
+
+Now take a look at the following disk_space.sh bash script:
+
+#!/bin/bash
+filesystems=("/" "/apps" "/database")
+for i in ${filesystems[@]}; do
+usage=$(df -h $i | tail -n 1 | awk '{print $5}' | cut -d % -f1)
+if [ $usage -ge 90 ]; then
+alert="Running out of space on $i, Usage is: $usage%"
+echo "Sending out a disk space alert email."
+echo $alert | mail -s "$i is $usage% full" your_email
+fi
+done
+
+First, you created a filesystems arrays that holds all the filesystems that you want to monitor. Then, for each filesystem, you grab the usage percentage and check to see if it’s bigger than or equal to 90. If usage is above 90%, it sends an alert email indicating that the filesystem is running out of space.
+
+Notice that you need to replace your_email in the script with your actual email.
+
+I ran the script:
+
+kabary@handbook:~$ ./disk_space.sh
+Sending out a disk space alert email.
+
+And I got the following email in my inbox:
+email notification from Linux server
+
+You may want to run the disk_space.sh script six hours or so. In this case, you can also schedule the script to run as a cron job:
+
+kabary@handbook:~$ crontab -e
+0	*/6 *		*		* /home/kabary/scripts/disk_space.sh
+
+You may practice some more by trying to solve the problems presented in the workbook below. And yes, they include the answers as well.

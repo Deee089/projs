@@ -1,0 +1,43 @@
+ 
+
+Etech Consulting Devops Masterclass Team3 Group level
+Project 5: Answer all questions
+
+
+Due on saturday @midnight EST time
+
+
+Question1:
+write a shell script that will create a directory in the default home of the user currently login into the server:
+your script should test the following
+
+
+-	The script can create any directory
+-	A file called $yourgroupname should be created within this directory
+-	write into that file the word " We are Etech Engineers"
+
+
+
+Question2:
+
+
+-	Create 3 ec2 instances in AWS named: dev, uat , prod
+-	Follow the steps in the video and class notes to create 3 identical users in all 3 servers
+-	Enable the password authentications in all 3 servers
+ 
+write a shell script that will do the following:
+-	move the file you created $yourgroupname into /home/ubuntu
+-	Test the content of the FILE " IS NOT EMPTY " then using the "for loop" copy the file into the 3 servers and place them at /home/ubuntu( remote directory)
+-	Your script should delete the file after a successful copy from the source server
+-	your script should also delete the directory you created from your source server
+
+
+Question3:
+
+
+write a shell script that will backup all the contents of /var/log/auth.log into a monitor.log file and moves the monitor.log file into a remote server in
+question 2
+-	configure a cronjob that will run every day at 15 mins after 5pm, every month and every day of the week
+
+
+"Thanks for chosing Etech consulting for your Devops Training"

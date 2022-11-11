@@ -1,0 +1,11 @@
+#!/bin/bash
+# This count prints in sequence the fruit in the set on the terminal.
+fruits=( orange apple mango pear banana pinapple )
+for fruit in ${fruits[@]}; do 
+    echo $fruit 
+   fruit=$[$fruit + 1]
+done 
+
+while fruit in ${fruits[@]}; do
+    actions
+done 

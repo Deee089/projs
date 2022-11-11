@@ -1,0 +1,4 @@
+#!/bin/bash
+#This stricpt collect logs from /var/log/kern.log file.
+cat -n /var/log/kern.log > $etechteam4group3
+echo "log file copy job completed"

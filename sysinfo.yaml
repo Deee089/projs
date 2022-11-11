@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+#script that generates the computer’s system information and sends it to a file.
+mkdir info;
+( date; echo ; uname -a; echo ; free -h;fdisk -l; echo ; ) > info/systeminfo.txt 2> info/systeminfoerror.txt;
+	
+( echo -e "\n DISK INFORMATION. \n"; sudo fdisk -l;echo ; ) >> info/systeminfo.txt; 
+lscpu | tee info/cpu_info_1.txt #output sent to both screen and file
+lscpu | tee info/cpuinfo_2.txt > /dev/null; #no output is sent to screen
+echo -e "\t\t\t Located in:$HOME/info/ \t\t\t";

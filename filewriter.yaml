@@ -1,0 +1,14 @@
+#!/bin/bash
+#This script Writes multiple line text into a file and print content to the screen.
+read -p "Please enter filename: " filename
+cat >> $filename <<EOL
+Gloria Awgu - Team Lead
+Remy Tienma
+Benoit K.
+Dele Adeneye
+KEHINDE TADE
+Samuel U
+EOL
+echo "These are the members of Team 4 Group 3"
+cat -n $filename
+~
